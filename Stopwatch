@@ -1,0 +1,64 @@
+import java.util.*
+import kotlin.system.exitProcess
+
+fun main() {
+    var isRunning = false
+    var startTime = 0L
+    var pausedTime = 0L
+    val timer = Timer()
+
+    fun startTimer() {
+        isRunning = true
+        startTime = System.currentTimeMillis() - pausedTime
+        timer.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                val elapsedTime = System.currentTimeMillis() - startTime
+                val milliseconds = (elapsedTime % 1000).toInt()
+                val seconds = (elapsedTime / 1000) % 60
+                val minutes = (elapsedTime / (1000 * 60)) % 60
+                val formatted = "%02d:%02d:%03d".format(minutes, seconds, milliseconds)
+                println(formatted)
+            }
+        }, 0, 10)
+    }
+
+    fun pauseTimer() {
+        isRunning = false
+        pausedTime += System.currentTimeMillis() - startTime
+        timer.cancel()
+    }
+
+    fun resetTimer() {
+        pausedTime = 0
+        timer.cancel()
+        println("00:00:000")
+    }
+
+    while (true) {
+        print("Enter 's' to start, 'p' to pause, 'r' to reset, or 'q' to quit: ")
+        val input = readLine()?.single()
+
+        when (input) {
+            's' -> {
+                if (!isRunning) {
+                    startTimer()
+                } else {
+                    println("Timer is already running.")
+                }
+            }
+            'p' -> {
+                if (isRunning) {
+                    pauseTimer()
+                } else {
+                    println("Timer is not running.")
+                }
+            }
+            'r' -> resetTimer()
+            'q' -> {
+                println("Exiting...")
+                exitProcess(0)
+            }
+            else -> println("Invalid input.")
+        }
+    }
+}
